@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Viagem {
+  id         String   @id @default(uuid())
+  destino    String
+  comeca_em  DateTime
+  termina_em DateTime
+  confirmado Boolean  @default(false)
+  criado_em  DateTime @default(now())
+
+  participantes Participante[]
+  atividades     Atividade[]
+  links          Link[]
+
+  @@map("viagens")
+}
+
+model Participante {
+  id         String  @id @default(uuid())
+  nome       String?
+  email      String
+  confirmado Boolean @default(false)
+  criador    Boolean @default(false)
+
+  viagem_id String
+  viagem    Viagem @relation(fields: [viagem_id], references: [id])
+
+  @@map("participantes")
+}
+
+model Atividade {
+  id     String   @id @default(uuid())
+  titulo String
+  quando DateTime
+
+  viagem_id String
+  viagem    Viagem @relation(fields: [viagem_id], references: [id])
+
+  @@map("atividades")
+}
+
+model Link {
+  id     String @id @default(uuid())
+  titulo String
+  url    String
+
+  viagem_id String
+  viagem    Viagem @relation(fields: [viagem_id], references: [id])
+
+  @@map("links")
+}
